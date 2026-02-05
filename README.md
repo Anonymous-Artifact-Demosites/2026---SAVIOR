@@ -26,7 +26,7 @@ Get it from: https://claude.ai/
 The tool uses Playwright MCP for browser automation.
 Follow Playwright installation instructions.
 
-### 5. 2Captcha API Key (Optional but Recommended)
+### 5. 2Captcha API Key
 Get an API key from: https://2captcha.com
 
 Set environment variable:
@@ -67,4 +67,5 @@ T1_step1_Screenshots/   # Screenshots
 **Important**: This tool is a demo version for the basic authorized security testing only.
 - Only test websites you have permission to test
 - Respect terms of service
+
 - Use responsibly and ethically
