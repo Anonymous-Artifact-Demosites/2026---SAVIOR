@@ -1,0 +1,43 @@
+================================================================================
+                    VULNERABILITY ANALYSIS REPORT - T2
+================================================================================
+
+[Basic Information]
+Target URL      : https://www.2captcha.com
+Domain          : 2captcha_com
+Test Time       : 2025-12-26 15:23:17 - 2025-12-26 15:31:11
+Duration        : 00:07:53
+
+[Vulnerability Overview]
+ID              : T2
+Name            : Unbound First-party Verification Hijacking
+Risk Level      : High
+Description     : OAuth registration and email registration create or link to
+                  the same account. An attacker can bypass email verification
+                  by using OAuth to access an unverified account, gaining
+                  control of an account associated with the victim's email.
+
+[Attack Analysis - 2captcha.com]
+Attack Path:
+1. Registered via email/password with test_account@example.com - system required email verification (confirmation code page)
+2. In a new browser session, registered via Google OAuth with the same email - system created account without email verification
+3. Logged in via email/password - accessed the exact same account created by OAuth (identical API Key confirmed)
+4. OAuth and email registration linked to the same account, bypassing verification
+Missing Security Check: OAuth registration should not auto-link to a pending unverified email registration, or should require the email owner to verify before merging accounts
+Proof of Vulnerability: API Key from OAuth login and email/password login are identical, confirming same account access from both registration paths
+
+[General Remediation]
+1. When an OAuth registration detects a matching pending (unverified) email
+   registration, require the user to complete email verification before
+   linking the accounts.
+2. Treat OAuth-created accounts and email-created accounts as separate
+   entities until explicit user-initiated linking with ownership proof.
+3. Bind verification tokens to the originating session to prevent
+   cross-session verification propagation.
+
+[Test Credentials (Redacted)]
+Test Email      : [REDACTED]
+Reg. Password   : [REDACTED]
+Gmail Password  : [REDACTED]
+
+================================================================================

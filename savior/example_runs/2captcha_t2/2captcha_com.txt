@@ -1,0 +1,59 @@
+========================================
+T2 Registration Security Test Result
+========================================
+URL: https://www.2captcha.com
+Domain: 2captcha_com
+Test Date: 2025-12-26
+Start Time: 2025-12-26 15:23:17
+End Time: 2025-12-26 15:31:11
+Duration: 00:07:53
+
+Test Email: test_account@example.com
+Registration Password: [REDACTED]
+Gmail Password: [REDACTED]
+
+========================================
+Test Results
+========================================
+Final Result: T2_VULN
+
+Phase 1 (Normal Registration): Email verification required
+Phase 2 (OAuth Registration): Completed without email verification
+Phase 3 (Email Login): Accessed same account as OAuth
+
+========================================
+Raw Output
+========================================
+---
+
+## FINAL RESULT
+
+**RESULT: T2_VULN**
+
+### Explanation:
+
+The Google OAuth registration and the email/password registration created/linked to the **SAME account**. This is a security issue because:
+
+1. When I registered via Google OAuth (PHASE 2), the system automatically created an account using the email address from the Google account (test_account@example.com) **without requiring email verification**.
+
+2. When I attempted to register via email/password (PHASE 1), the system required email verification (stuck at confirmation code page).
+
+3. However, when I logged in with email/password (PHASE 3) using the credentials from PHASE 1, I was able to access the **exact same account** that was created via OAuth, as evidenced by the identical API Key.
+
+This means that Google OAuth bypassed the email verification requirement and automatically linked/created an account that can be accessed via password without the email owner ever verifying they own that email address. This is a classic account takeover vulnerability where:
+
+- An attacker could register via OAuth using a victim's email
+- The victim later tries to register with their email normally
+- Both end up controlling the same account, but the OAuth registration bypassed email verification
+
+VULN_ANALYSIS_START
+Attack Path:
+1. Registered via email/password with test_account@example.com - system required email verification (confirmation code page)
+2. In a new browser session, registered via Google OAuth with the same email - system created account without email verification
+3. Logged in via email/password - accessed the exact same account created by OAuth (identical API Key confirmed)
+4. OAuth and email registration linked to the same account, bypassing verification
+Missing Security Check: OAuth registration should not auto-link to a pending unverified email registration, or should require the email owner to verify before merging accounts
+Proof of Vulnerability: API Key from OAuth login and email/password login are identical, confirming same account access from both registration paths
+VULN_ANALYSIS_END
+
+========================================

@@ -1,0 +1,99 @@
+$auditor_context
+
+Use Playwright MCP tool. DO NOT generate code files. DO NOT use JavaScript.
+If you hit any step that cannot be safely automated (e.g. unsolved captcha, mobile/phone verification or other human-only checks), pause automation, explain what manual action is needed, and then wait for the user to complete it before you continue.
+GOAL: Open new browser,Test if website has OAuth binding management feature and what level of information it displays.
+
+Google Credentials: Email=$google_email, Password=$google_password
+
+TARGET: $url
+
+TASK:
+1. Visit the website
+2. Find and click Google login/signin button (try all possible variations and locations)
+3. Complete Google login with provided credentials
+4. After login, find the settings/account management page (try all possible paths: menus, URLs, links)
+5. Look for OAuth/account binding management section (check all tabs, all sections)
+6. Analyze what information is displayed about OAuth bindings
+
+CLASSIFICATION:
+- T5_SAFE:  Has feature, shows actual OAuth account related information.
+- T5_VULN: No OAuth binding management feature found
+- T5_WEAK: Has feature, only shows provider name and/or binding status (Connected/Not connected)
+IMPORTANT: First determine the result (T5_SAFE/T5_VULN/T5_WEAK), then take screenshot.
+
+SCREENSHOT:
+After you determine the classification result:
+- If T5_SAFE: save to $t5_safe_folder_abs
+- If T5_VULN: save to $t5_vuln_folder_abs  
+- If T5_WEAK: save to $t5_weak_folder_abs
+- Filename: $domain.png
+- Capture the final page showing OAuth section (or settings page if no OAuth found)
+
+OUTPUT FORMAT (plain text, NO markdown):
+RESULT: [T5_SAFE or T5_VULN or T5_WEAK]
+REASON: [explain what you found and why this classification]
+
+If T5_VULN or T5_WEAK:
+OAUTH_INFO_START
+[any relevant details about what's displayed]
+OAUTH_INFO_END
+
+IF RESULT is T5_VULN or T5_WEAK, you MUST also output vulnerability analysis:
+
+VULN_ANALYSIS_START
+Attack Path:
+1. [Describe: How you logged in via Google OAuth]
+2. [Describe: How you navigated to settings/account page]
+3. [Describe: All locations you searched for OAuth binding management]
+4. [Describe: What you found or didn't find]
+Missing Security Check: [For T5_VULN: "No OAuth binding management feature exists" / For T5_WEAK: "OAuth management shows only provider name, no account details"]
+Proof of Vulnerability: [e.g., "Searched /settings, /account, /profile, /security - no section showing connected OAuth accounts or their details"]
+Settings URLs Checked: [List all URLs/paths you tried]
+VULN_ANALYSIS_END
+
+STRATEGY: Be flexible and thorough. Try every possible way to find Google login, settings page, and OAuth section. Use all Playwright capabilities to search, navigate, and extract information.
+
+--- OUTPUT REQUIREMENTS ---
+
+After completing all steps above, you MUST output the following three blocks at the end of your response. These are in ADDITION to the RESULT and VULN_ANALYSIS blocks above.
+
+BLOCK 1 - Structured observations (JSON wrapped in XML tags):
+
+<observations>
+{
+  "task_id": "T5",
+  "target_url": "<the exact URL tested>",
+  "steps_completed": "<array of integer step numbers completed, e.g. [1,2,3,4,5,6]>",
+  "execution_status": "<one of: completed, interrupted, failed>",
+  "captcha_encountered": "<boolean: true if any CAPTCHA was encountered>",
+  "screenshots": "<array of screenshot filenames saved during this test>",
+  "task_specific": {
+    "oauth_login_succeeded": "<boolean: true if Google OAuth login completed successfully>",
+    "has_binding_management": "<boolean: true if any OAuth/third-party account binding management section was found>",
+    "shows_account_details": "<boolean: true if the binding management shows actual account details (email, user ID, etc.)>",
+    "shows_provider_name_only": "<boolean: true if the binding management only shows provider name and/or connection status>"
+  }
+}
+</observations>
+
+BLOCK 2 - Your verdict:
+
+<verdict>
+RESULT: <one of T5_SAFE, T5_VULN, T5_WEAK>
+CONFIDENCE: <one of high, medium, low>
+REASONING: <one sentence explaining why you chose this result>
+</verdict>
+
+BLOCK 3 - Evidence (only if RESULT is T5_VULN or T5_WEAK):
+
+<evidence>
+VULN_ANALYSIS_START
+(same content as the VULN_ANALYSIS block you already output above)
+VULN_ANALYSIS_END
+</evidence>
+
+If RESULT is T5_SAFE, still output:
+<evidence>
+None
+</evidence>

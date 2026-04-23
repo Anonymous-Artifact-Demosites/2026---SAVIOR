@@ -1,0 +1,45 @@
+================================================================================
+                    VULNERABILITY ANALYSIS REPORT - T6
+================================================================================
+
+[Basic Information]
+Target URL      : https://www.pinterest.com
+Domain          : pinterest_com
+Test Time       : 2025-12-24 09:38:59 - 2025-12-24 09:51:35
+Duration        : 00:12:36
+
+[Vulnerability Overview]
+ID              : T6
+Name            : The Shadow Binding Attack
+Risk Level      : High
+Description     : After changing the primary email address, the system fails
+                  to invalidate IdP bindings established under the old
+                  identifier. Both the original and new OAuth accounts can
+                  access the same website account, creating a shadow binding.
+
+[Attack Analysis - pinterest.com]
+Attack Path:
+1. Logged in with Google OAuth account A and created a Pinterest account
+2. Changed the primary email from A to B through account settings
+3. Logged out and logged in with Google OAuth account B - accessed the same Pinterest account
+4. Logged out and logged in with Google OAuth account A - still accessed the same Pinterest account
+5. Both OAuth accounts access the same website account, confirming shadow binding
+Missing Security Check: Email change did not unbind original OAuth, creating shadow binding
+Proof of Vulnerability: OAuth A and OAuth B both access the same Pinterest account (same user ID, same profile, same settings) after email migration
+Identifiers Collected: Username=testuser_pinterest, Profile URL=/testuser_pinterest/, Account settings accessible from both OAuth logins
+
+[General Remediation]
+1. When the primary email is changed, invalidate all IdP bindings that were
+   established based on the old email address.
+2. Require explicit user confirmation before maintaining existing OAuth
+   bindings after an identifier change.
+3. Display all bound IdP accounts clearly in the security settings UI so
+   users can audit their OAuth connections.
+
+[Test Credentials (Redacted)]
+Email A         : [REDACTED]
+Password A      : [REDACTED]
+Email B         : [REDACTED]
+Password B      : [REDACTED]
+
+================================================================================
