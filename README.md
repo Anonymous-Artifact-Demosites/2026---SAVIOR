@@ -9,7 +9,7 @@ SAVIOR is a system for analyzing account-management vulnerabilities in integrate
 The repository includes:
 
 - `savior/` - source code and example artifacts
-- `savior/SAVIOR_GUIDE.md` - detailed technical guide for reviewers
+- `savior/SAVIOR_GUIDE.md` -  detailed technical guide aligned with §5 of the paper
 - `previous_release/` - previously released files
 
 ## Repository Layout
